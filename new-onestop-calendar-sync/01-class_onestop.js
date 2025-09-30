@@ -12,6 +12,7 @@ var __assign = (this && this.__assign) || function () {
 };
 var Onestop = /** @class */ (function () {
     function Onestop() {
+        Logger.log('Onestop GCal Sync v'.concat(VERSION));
         this.onestopSheet = SpreadsheetApp.getActiveSpreadsheet();
 
         var sheets = this.getWeekSheets();

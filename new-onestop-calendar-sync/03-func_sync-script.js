@@ -3,7 +3,6 @@ function updateCalendars() {
     OnestopCalendarController.updateAllMinistries();
 }
 function handleEdit() {
-    Logger.log('onEdit trigger fired');
     OnestopCalendarController.grabCalendars();
     TriggerController.getCurrentTriggers();
     TriggerController.createAndDeleteTriggers();

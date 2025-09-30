@@ -1,4 +1,6 @@
 // Compiled using wl-onestop 1.0.0 (TypeScript 4.9.5)
+const VERSION = "0.2";
+
 var _a, _b;
 var CHURCHWIDE_CALENDAR_ID = 'c_2f60136210a2f5edd3666b27c2d4dae4d2c80f8d879a2d4140e9013a3e17a4f6@group.calendar.google.com';
 var INTL_CALENDAR_ID = 'c_389070cca9e2ceff2f8de338ffbef3420ea53a93c185ec1701a5de5fb8385d06@group.calendar.google.com';
