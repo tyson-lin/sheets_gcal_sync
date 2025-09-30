@@ -1,10 +1,10 @@
 // Compiled using wl-onestop 1.0.0 (TypeScript 4.9.5)
 var CalendarEvent = /** @class */ (function () {
     function CalendarEvent(gCalendar, dateData, eventData, tags) {
-        this.isAllDayEvent = false;
+        this.isAllDayEvent = eventData.allDayEvent;
         this.gCalendar = gCalendar;
         this.eventTitle = eventData.what;
-        this.setTimes(dateData, eventData.startTime, eventData.endTime);
+        this.setTimes(dateData, eventData.startTimeDate, eventData.endTimeDate);
         this.inCharge = eventData.inCharge;
         this.location = eventData.location;
         this.additionalAssigments = eventData.whoElse;
@@ -44,10 +44,53 @@ var CalendarEvent = /** @class */ (function () {
             var rowStartDate = this.eventStart.createDate(this.isAllDayEvent);
             var rowEndDate = this.eventEnd.createDate(this.isAllDayEvent);
             var eventEndDateToUse = this.eventStart.isSameDay(this.eventEnd) ? null : rowEndDate;
-            this.gCalendarEvent = this.gCalendar.createAllDayEvent(this.eventTitle, rowStartDate, eventEndDateToUse, { description: this.getEventDescription() });
+
+            // exponential back off to prevent overloading the calendar service
+            var tries = 0;
+            var maxTries = 5;
+            var waitTime = 100;
+            var scale = 1.5;
+            try {
+                this.gCalendarEvent = this.gCalendar.createAllDayEvent(this.eventTitle, rowStartDate, eventEndDateToUse, { description: this.getEventDescription() });
+            } catch {
+                while (tries < maxTries) {
+                    try {
+                        Utilities.sleep(waitTime);
+                        this.gCalendarEvent = this.gCalendar.createAllDayEvent(this.eventTitle, rowStartDate, eventEndDateToUse, { description: this.getEventDescription() });
+                        break;
+                    } catch {
+                        tries++;
+                        waitTime = waitTime * scale;
+                    }
+                }
+                if (tries >= maxTries) {
+                    Logger.log("Failed to add all day event: ".concat(this.eventTitle));
+                }  
+            }          
         }
         else {
-            this.gCalendarEvent = this.gCalendar.createEvent(this.eventTitle, this.eventStart.createDate(), this.eventEnd.createDate(), { description: this.getEventDescription() });
+            // exponential back off to prevent overloading the calendar 
+            var tries = 0;
+            var maxTries = 5;
+            var waitTime = 100;
+            var scale = 1.5;
+            try {
+                this.gCalendarEvent = this.gCalendar.createEvent(this.eventTitle, this.eventStart.createDate(), this.eventEnd.createDate(), { description: this.getEventDescription() });
+            } catch {
+                while (tries < maxTries) {
+                    try {
+                        Utilities.sleep(waitTime);
+                        this.gCalendarEvent = this.gCalendar.createEvent(this.eventTitle, this.eventStart.createDate(), this.eventEnd.createDate(), { description: this.getEventDescription() });
+                        break;
+                    } catch {
+                        tries++;
+                        waitTime = waitTime * scale;
+                    }
+                }
+                if (tries >= maxTries) {
+                    Logger.log("Failed to add timed event: ".concat(this.eventTitle));
+                }
+            }    
         }
     };
     CalendarEvent.prototype.getEventDescription = function () {

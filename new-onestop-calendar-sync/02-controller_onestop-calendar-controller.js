@@ -21,6 +21,7 @@ var OnestopCalendarController = /** @class */ (function () {
     };
     OnestopCalendarController.createEventsForWeek = function (weekSheet) {
         var _this = this;
+        Logger.log("weekSheet.dailyData\n: ".concat(JSON.stringify(weekSheet.dailyData)));
         weekSheet.dailyData.forEach(function (daySection) {
             Logger.log("Creating events for ".concat(daySection.dateData.month, "/").concat(daySection.dateData.day));
             daySection.eventsData.forEach(function (event) {
@@ -33,9 +34,12 @@ var OnestopCalendarController = /** @class */ (function () {
     OnestopCalendarController.createEventsForWeekByMinistry = function (weekSheet, ministry) {
         var calendar = this.ministryCalendars[ministry];
         weekSheet.dailyData.forEach(function (daySection) {
-            Logger.log("Creating ".concat(ministry, " events for ").concat(daySection.dateData.month, "/").concat(daySection.dateData.day));
+            Logger.log("Ministry: ".concat(ministry));
+            Logger.log("daySection.eventsData:\n".concat(JSON.stringify(daySection.eventsData)));
+
             daySection.getEventDataByMinistry(ministry).forEach(function (event) {
                 Logger.log("Attempting to add ".concat(JSON.stringify(event)));
+
                 var eventWasSuccessfullyAdded = calendar.addEventToCalendar(daySection.dateData, event, { week: weekSheet.sheetName });
                 if (eventWasSuccessfullyAdded) {
                     if (weekSheet.isErroringRow(event.row)) {
@@ -52,9 +56,11 @@ var OnestopCalendarController = /** @class */ (function () {
         var weeks = this.onestop.weeks;
         var weeksAndMinistriesThatNeedSync = this.onestop.weekNamesAndMinistriesThatNeedSync();
         var clearedEarliest = [];
+        Logger.log("All weeks: ".concat(weeks.map(function (week) { return week.sheetName; }).join(', ')));
         Logger.log("Updating calendars: ".concat(JSON.stringify(weeksAndMinistriesThatNeedSync.map(function (needsSync) { return ({ week: needsSync.week, ministries: needsSync.ministries }); }))));
         weeksAndMinistriesThatNeedSync.forEach(function (needsSync) {
-            var weekToSync = weeks.find(function (week) { return week.sheetName === needsSync.week || week.sheetName === "".concat(needsSync.week, "(WIP)"); });
+            var weekToSync = weeks.find(function (week) { return week.sheetName == needsSync.week || week.sheetName == "".concat(needsSync.week, "(WIP)"); });
+            Logger.log("needsSync.ministries: ".concat(JSON.stringify(needsSync.ministries)));
             needsSync.ministries.forEach(function (ministry) {
                 if (!clearedEarliest.includes(ministry)) {
                     OnestopCalendarController.deleteEventsBeforeEarliestOnestopDateByMinistry(ministry);
@@ -67,14 +73,29 @@ var OnestopCalendarController = /** @class */ (function () {
         var newOnestop = new Onestop();
         newOnestop.saveHashes();
     };
-    OnestopCalendarController.ministryCalendars = {
-        Childcare: new CalendarWrapper(CHILDCARE_CALENDAR_ID),
-        Churchwide: new CalendarWrapper(CHURCHWIDE_CALENDAR_ID),
-        Domestic: new CalendarWrapper(COLLEGE_CALENDAR_ID),
-        INTL: new CalendarWrapper(INTL_CALENDAR_ID),
-        Youth: new CalendarWrapper(YOUTH_CALENDAR_ID),
-        Joyland: new CalendarWrapper(JOYLAND_CALENDAR_ID)
-    };
+    OnestopCalendarController.grabCalendars = function () {
+        Object.keys(this.caldendarIds).forEach(key => {
+            OnestopCalendarController.ministryCalendars[key] = new CalendarWrapper(this.caldendarIds[key]);
+        })
+    }
+    OnestopCalendarController.caldendarIds = {
+        Childcare: CHILDCARE_CALENDAR_ID,
+        ALL: CHURCHWIDE_CALENDAR_ID,
+        CPIs: COLLEGE_CALENDAR_ID,
+        Intl: INTL_CALENDAR_ID,
+        Youth: YOUTH_CALENDAR_ID,
+        Joyland: JOYLAND_CALENDAR_ID,
+        Weekly: WEEKLY_CALENDAR_ID
+    }
+    // OnestopCalendarController.ministryCalendars = {
+    //     Childcare: new CalendarWrapper(CHILDCARE_CALENDAR_ID),
+    //     Churchwide: new CalendarWrapper(CHURCHWIDE_CALENDAR_ID),
+    //     Domestic: new CalendarWrapper(COLLEGE_CALENDAR_ID),
+    //     INTL: new CalendarWrapper(INTL_CALENDAR_ID),
+    //     Youth: new CalendarWrapper(YOUTH_CALENDAR_ID),
+    //     Joyland: new CalendarWrapper(JOYLAND_CALENDAR_ID)
+    // };
+    OnestopCalendarController.ministryCalendars = {};
     OnestopCalendarController.onestop = new Onestop();
     return OnestopCalendarController;
 }());

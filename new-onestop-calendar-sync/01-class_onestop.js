@@ -13,9 +13,15 @@ var __assign = (this && this.__assign) || function () {
 var Onestop = /** @class */ (function () {
     function Onestop() {
         this.onestopSheet = SpreadsheetApp.getActiveSpreadsheet();
-        this.weeks = this.getWeekSheets().map(function (weekSheet) { return new WeekSheet(weekSheet); });
+
+        var sheets = this.getWeekSheets();
+        sheets.forEach(sheet => {
+            Logger.log(sheet.getName());
+        })
+        this.weeks = this.getWeekSheets().map(function (weekSheet) { Logger.log(weekSheet.getName()); return new WeekSheet(weekSheet); });
         this.scheduleHashesRange = this.onestopSheet.getSheetByName('SyncHashes').getRange(1, 1);
         this.isUpdatingCell = this.onestopSheet.getSheetByName('SyncHashes').getRange(2, 2, 1, 1).getCell(1, 1);
+        Logger.log("Updating cell value is " + this.isUpdatingCell.getValue());
     }
     Onestop.prototype.getWeekSheets = function () {
         return this.onestopSheet.getSheets().filter(function (sheet) { return !sheet.isSheetHidden(); }).filter(function (sheet) { return ONESTOP_WEEK_TAB_REGEX.test(sheet.getName()); });
@@ -43,6 +49,7 @@ var Onestop = /** @class */ (function () {
     };
     Onestop.prototype.saveHashes = function () {
         var syncHashes = this.getHashes();
+        console.log('saving hashes', syncHashes);
         this.scheduleHashesRange.setValue(JSON.stringify(syncHashes));
     };
     Onestop.prototype.clearHashes = function () {

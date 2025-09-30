@@ -1,13 +1,15 @@
 // Compiled using wl-onestop 1.0.0 (TypeScript 4.9.5)
 var _a, _b;
-var CHURCHWIDE_CALENDAR_ID = "c_2f60136210a2f5edd3666b27c2d4dae4d2c80f8d879a2d4140e9013a3e17a4f6@group.calendar.google.com";
-var INTL_CALENDAR_ID = "c_ea57584db7ac69c249d244e83aef61f645a371b9657044b8cf8e256be281d18c@group.calendar.google.com";
-var COLLEGE_CALENDAR_ID = "c_e3acab659301a264d9e0f2dbc8b594b3bca6a7a9b463a168492c0a8dd9139b42@group.calendar.google.com";
-var CHILDCARE_CALENDAR_ID = "c_3854bf091e4ce2cbf91f85fef9eb5b76cbaaa20474bcb7fa3a9177856a15e372@group.calendar.google.com";
-var YOUTH_CALENDAR_ID = "c_47254d47557076ba702ef01ea8010e3cd66c50d0231d08046c30f1478394f357@group.calendar.google.com";
-var JOYLAND_CALENDAR_ID = "c_b1a7751fdf1d6ca4c8759fa5e75d295cc071bc230207454413e56b8c93dc29fd@group.calendar.google.com";
+var CHURCHWIDE_CALENDAR_ID = 'c_2f60136210a2f5edd3666b27c2d4dae4d2c80f8d879a2d4140e9013a3e17a4f6@group.calendar.google.com';
+var INTL_CALENDAR_ID = 'c_389070cca9e2ceff2f8de338ffbef3420ea53a93c185ec1701a5de5fb8385d06@group.calendar.google.com';
+var COLLEGE_CALENDAR_ID = 'c_ec861eac95dc475be498a1ed88c8036614aebd20acd8277b538cf037817fe93a@group.calendar.google.com';
+var CHILDCARE_CALENDAR_ID = 'c_8e7fe09dca16bc299b1a41ad9ad74e37ecd641be0da415f5089fbe3864244a61@group.calendar.google.com';
+var YOUTH_CALENDAR_ID = 'c_4bb8da6d790ee3e432174728e34a9af48c2286f0e3a330155fe9c41b4fa04a10@group.calendar.google.com';
+var JOYLAND_CALENDAR_ID = 'c_978aa946f2a781552f4567c954f8d128c2cda12cb54aff678920b6710ace27b8@group.calendar.google.com';
+var WEEKLY_CALENDAR_ID = 'c_01fe3393b0ad531984cd140bd46bf339aa5d2d9fdfd047a5135c13c8ae10e34d@group.calendar.google.com';
 var IS_ALL_DAY = function (stringToCheck) { return stringToCheck === "all day" || stringToCheck === "All day" || stringToCheck === "All Day" || stringToCheck === "ALL DAY"; };
-var ONESTOP_WEEK_TAB_REGEX = /\d{1,2}\/\d{1,2}[A-Za-z]{3}-([A-Za-z]{3})?\d{1,2}\/\d{1,2}[A-Za-z]{3}(?:\(WIP\))?/;
+//var ONESTOP_WEEK_TAB_REGEX = /\d{1,2}\/\d{1,2}[A-Za-z]{3}-([A-Za-z]{3})?\d{1,2}\/\d{1,2}[A-Za-z]{3}(?:\(WIP\))?/;
+var ONESTOP_WEEK_TAB_REGEX = /^(\d{1,2}\/\d{1,2})-(\d{1,2}\/\d{1,2})\s*\(WK(\d+)\)$/;
 var ONESTOP_COLUMN_VALUES = {
     MINISTRY: 1,
     START: 2,

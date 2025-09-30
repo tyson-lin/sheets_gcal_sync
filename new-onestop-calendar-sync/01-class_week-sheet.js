@@ -8,6 +8,9 @@ var DaySection = /** @class */ (function () {
         this.eventsData.push(eventData);
     };
     DaySection.prototype.getEventDataByMinistry = function (ministry) {
+        // Logger.log("Ministry: ", ministry);
+        // Logger.log("EventsData: ", this.eventsData);
+
         return this.eventsData.filter(function (event) { return event.ministry === ministry; });
     };
     return DaySection;
@@ -38,6 +41,8 @@ var WeekSheet = /** @class */ (function () {
         return {
             row: row,
             ministry: eventRange.getCell(1, ONESTOP_COLUMN_VALUES.MINISTRY).getValue(),
+            startTimeDate: new Date(eventRange.getCell(1, ONESTOP_COLUMN_VALUES.START).getValue()),
+            endTimeDate: new Date(eventRange.getCell(1, ONESTOP_COLUMN_VALUES.END).getValue()),
             startTime: eventRange.getCell(1, ONESTOP_COLUMN_VALUES.START).getValue(),
             endTime: eventRange.getCell(1, ONESTOP_COLUMN_VALUES.END).getValue(),
             what: eventRange.getCell(1, ONESTOP_COLUMN_VALUES.WHAT).getValue(),
@@ -46,9 +51,10 @@ var WeekSheet = /** @class */ (function () {
             whoElse: eventRange.getCell(1, ONESTOP_COLUMN_VALUES.WHO_ELSE).getValue(),
             food: eventRange.getCell(1, ONESTOP_COLUMN_VALUES.FOOD).getValue(),
             childcare: eventRange.getCell(1, ONESTOP_COLUMN_VALUES.CHILD).getValue(),
-            tech: eventRange.getCell(1, ONESTOP_COLUMN_VALUES.TECH).getValue(),
+            //tech: eventRange.getCell(1, ONESTOP_COLUMN_VALUES.TECH).getValue(),
             note: eventRange.getCell(1, ONESTOP_COLUMN_VALUES.NOTE).getValue(),
-            struckThrough: eventRange.getCell(1, ONESTOP_COLUMN_VALUES.WHAT).getFontLine() === 'line-through'
+            struckThrough: eventRange.getCell(1, ONESTOP_COLUMN_VALUES.WHAT).getFontLine() === 'line-through',
+            allDayEvent: IS_ALL_DAY(eventRange.getCell(1, ONESTOP_COLUMN_VALUES.START).getValue()) && IS_ALL_DAY(eventRange.getCell(1, ONESTOP_COLUMN_VALUES.END).getValue())
         };
     };
     WeekSheet.prototype.isErroringRow = function (row) {
@@ -74,22 +80,80 @@ var WeekSheet = /** @class */ (function () {
         noteCell.setValue(noteCell.getValue().replace(this.errorNote, ''));
     };
     WeekSheet.prototype.setWeekData = function () {
+
+        // var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('8/25-8/31 (WK1)');
+        // var startTimes = sheet.getRange(1, 2, 10, 1).getValues();
+        // Logger.log(startTimes);
+
+        // startTimes.forEach(function(startTime) {
+        //     Logger.log(String(startTime));     
+        //     Logger.log(startTime);
+        // })
+
         var numRows = this.gSheet.getMaxRows();
         // TODO: Right how this assumes that the event data starts from row 2. This is error prone because it might not, so we might need to fix this in the future.
         for (var i = 2; i <= numRows; i++) {
-            var possibleDate = new Date(this.gSheet.getRange(i, 1).getCell(1, 1).getValue());
-            var rowIsDate = !isNaN(possibleDate.getTime());
-            if (rowIsDate) {
+        //for (var i = 2; i <= 20; i++) {
+            var row = this.gSheet.getRange(i, 1, 1, 11).getValues();
+            //Logger.log(row);
+
+            // Different error handling things
+            var startTime = row[0][ONESTOP_COLUMN_VALUES.START - 1];
+            var endTime = row[0][ONESTOP_COLUMN_VALUES.END - 1];
+            var what = row[0][ONESTOP_COLUMN_VALUES.WHAT - 1];
+
+            var startTimeString = String(startTime);
+            var endTimeString = String(endTime);
+            var whatString = String(what);
+            
+            var isRowEmpty = (startTimeString == "") &&
+                             (endTimeString == "") &&
+                             (whatString == "");
+            var missingStartTime = (startTimeString == "");
+            var missingEndTime = (endTimeString == "");
+            var missingWhat = (whatString == "");
+
+            var possibleDate = new Date(this.gSheet.getRange(i, 2).getCell(1, 1).getValue());
+            var startTimeIsDate = !(possibleDate.getFullYear() == 1899) && !missingStartTime && missingEndTime;
+
+
+            if (isRowEmpty) { continue; }
+            if (missingStartTime && !missingEndTime) { continue;}
+            if (!missingStartTime && missingEndTime && !startTimeIsDate) { continue; }
+
+
+            if (startTimeIsDate) {
+                Logger.log("Row ".concat(i, " is a date row with possible date ").concat(possibleDate));
+                Logger.log("Row ".concat(i, " missing start time: ").concat(missingStartTime, ", missing end time: ").concat(missingEndTime, ", start time is date: ").concat(startTimeIsDate));
+                Logger.log("startTimeString: '".concat(startTimeString));
                 this.dailyData.push(new DaySection(possibleDate.getFullYear(), possibleDate.getMonth(), possibleDate.getDate()));
             }
             else {
                 var eventData = this.eventDataFromRow(i);
                 if (eventData.what && !eventData.struckThrough) {
                     var mostRecentDay = this.dailyData[this.dailyData.length - 1];
+                    Logger.log("mostRecentDay: ".concat(JSON.stringify(mostRecentDay.dateData)));
+
+                    eventData.startTimeDate.setFullYear(mostRecentDay.dateData.year);
+                    eventData.startTimeDate.setMonth(mostRecentDay.dateData.month);
+                    eventData.startTimeDate.setDate(mostRecentDay.dateData.day);
+                    eventData.startTimeDate.setHours(eventData.startTimeDate.getHours() + 1);
+
+                    eventData.endTimeDate.setFullYear(mostRecentDay.dateData.year);
+                    eventData.endTimeDate.setMonth(mostRecentDay.dateData.month);
+                    eventData.endTimeDate.setDate(mostRecentDay.dateData.day);
+                    eventData.endTimeDate.setHours(eventData.endTimeDate.getHours() + 1);
+
+
+                    //Logger.log(eventData);
+                    eventData.year = mostRecentDay.dateData.year;
+                    eventData.month = mostRecentDay.dateData.month;
+                    eventData.day = mostRecentDay.dateData.day;
                     mostRecentDay.addEventData(eventData);
                 }
             }
         }
+        Logger.log(mostRecentDay);
     };
     return WeekSheet;
 }());

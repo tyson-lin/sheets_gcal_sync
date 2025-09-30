@@ -1,12 +1,32 @@
 // Compiled using wl-onestop 1.0.0 (TypeScript 4.9.5)
 var CalendarWrapper = /** @class */ (function () {
     function CalendarWrapper(calendarId) {
+        console.log('Getting calendar by ID: ', calendarId);
         this.gCalendar = CalendarApp.getCalendarById(calendarId);
     }
     CalendarWrapper.prototype.clearEventsBetweenDates = function (start, end) {
         var events = this.gCalendar.getEvents(start, end);
+        var tries = 0;
+        const maxTries = 5;
+        var waitTime = 10;
+        const scale = 2;
         events.forEach(function (event) {
-            event.deleteEvent();
+            // exponential backoff to avoid overloading the Calendar API
+            tries = 0; waitTIme = 10;
+            try {
+                event.deleteEvent();
+            } catch {
+                while (tries < maxTries) {
+                    try {
+                        Utilities.sleep(waitTime);
+                        event.deleteEvent();
+                        break;
+                    } catch {
+                        tries++;
+                        waitTime *= scale;
+                    }
+                }
+            }
         });
     };
     CalendarWrapper.prototype.clearEventsOnCalendar = function () {
