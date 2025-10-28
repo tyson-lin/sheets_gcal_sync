@@ -77,6 +77,8 @@ var OnestopCalendarController = /** @class */ (function () {
         });
         var newOnestop = new Onestop();
         newOnestop.saveHashes();
+
+        Logger.log("Total events added: ".concat(this.onestop.countEvents()));
     };
     OnestopCalendarController.grabCalendars = function () {
         Object.keys(this.caldendarIds).forEach(key => {

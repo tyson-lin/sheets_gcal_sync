@@ -21,6 +21,7 @@ var WeekSheet = /** @class */ (function () {
         this.gSheet = gSheet;
         this.dailyData = [];
         this.sheetName = gSheet.getName();
+        this.numEvents = 0;
         this.setWeekData();
         var startAndEndDateRegex = /\b\d{1,2}\/\d{1,2}(?=\D)/g;
         var _a = this.sheetName.match(startAndEndDateRegex), firstDayString = _a[0], lastDayString = _a[1];
@@ -92,6 +93,7 @@ var WeekSheet = /** @class */ (function () {
 
         var numRows = this.gSheet.getMaxRows();
         // TODO: Right how this assumes that the event data starts from row 2. This is error prone because it might not, so we might need to fix this in the future.
+        this.numEvents = 0;
         for (var i = 2; i <= numRows; i++) {
         //for (var i = 2; i <= 20; i++) {
             var row = this.gSheet.getRange(i, 1, 1, 11).getValues();
@@ -144,10 +146,11 @@ var WeekSheet = /** @class */ (function () {
                     eventData.month = mostRecentDay.dateData.month;
                     eventData.day = mostRecentDay.dateData.day;
                     mostRecentDay.addEventData(eventData);
+                    this.numEvents += 1;
                 }
             }
         }
-        //Logger.log(mostRecentDay);
+        Logger.log("Events added for week sheet ".concat(this.sheetName, ": ").concat(this.numEvents));
     };
     return WeekSheet;
 }());

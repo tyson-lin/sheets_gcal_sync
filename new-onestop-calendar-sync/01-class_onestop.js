@@ -81,5 +81,13 @@ var Onestop = /** @class */ (function () {
         this.isUpdatingCell.setValue(isBeingUpdated);
         Logger.log("Set updating cell to ".concat(isBeingUpdated));
     };
+    Onestop.prototype.countEvents = function () {
+        var total = 0;
+        this.weeks.forEach(function(week) {
+            Logger.log("Week ".concat(week.sheetName, " has ").concat(week.numEvents, " events."));
+            total += week.numEvents;
+        });
+        return total;
+    }
     return Onestop;
 }());
