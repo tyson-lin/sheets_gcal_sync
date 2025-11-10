@@ -145,6 +145,7 @@ var WeekSheet = /** @class */ (function () {
             else {
                 var eventData = this.eventDataFromRow(i);
                 eventData.ministry = this.getMinistry(tag);
+                eventData.allDayEvent = isAllDayEvent;
                 if (eventData.ministry === null) {
                     Logger.log("Row ".concat(i, " has an invalid ministry tag: ").concat(tag));
                     continue;
