@@ -149,11 +149,11 @@ var WeekSheet = /** @class */ (function () {
         // TODO: Right how this assumes that the event data starts from row 2. This is error prone because it might not, so we might need to fix this in the future.
         this.numEvents = 0;
         for (var i = 2; i <= numRows; i++) {
-        //for (var i = 2; i <= 20; i++) {
             var row = this.gSheet.getRange(i, 1, 1, 11).getValues();
-            // Logger.log(row);
+            //Logger.log(row);
 
             var rowDisplayValues = this.gSheet.getRange(i, 1, 1, 11).getDisplayValues();
+            //Logger.log(rowDisplayValues);
             var rowType = this.getRowType(row, this.isRowDate(rowDisplayValues));
             //Logger.log("rowType: ".concat(rowType));
 
@@ -162,6 +162,7 @@ var WeekSheet = /** @class */ (function () {
             }
             if (rowType === 3) {
                 var possibleDate = new Date(this.gSheet.getRange(i, 2).getCell(1, 1).getValue());
+                //Logger.log("Adding new DaySection for date: ".concat(possibleDate.getFullYear(), "-").concat(possibleDate.getMonth(), "-").concat(possibleDate.getDate()));
                 this.dailyData.push(new DaySection(possibleDate.getFullYear(), possibleDate.getMonth(), possibleDate.getDate()));
             } 
             else {
@@ -170,7 +171,7 @@ var WeekSheet = /** @class */ (function () {
                 var tag = String(row[0][ONESTOP_COLUMN_VALUES.MINISTRY - 1]);
                 eventData.ministry = this.getMinistry(tag);
                 if (eventData.ministry === null) {
-                    Logger.log("Row ".concat(i, " has an invalid ministry tag: ").concat(tag));
+                    //Logger.log("Row ".concat(i, " has an invalid ministry tag: ").concat(tag));
                     continue;
                 }
 
@@ -182,7 +183,7 @@ var WeekSheet = /** @class */ (function () {
 
                 if (eventData.what && !eventData.struckThrough) {
                     var mostRecentDay = this.dailyData[this.dailyData.length - 1];
-                    Logger.log("mostRecentDay: ".concat(JSON.stringify(mostRecentDay.dateData)));
+                    //Logger.log("mostRecentDay: ".concat(JSON.stringify(mostRecentDay.dateData)).concat(" for event in row ").concat(i));
 
                     eventData.startTimeDate.setFullYear(mostRecentDay.dateData.year);
                     eventData.startTimeDate.setMonth(mostRecentDay.dateData.month);

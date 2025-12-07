@@ -8,8 +8,8 @@ var alt_tags = {
 };
 
 var row_regex = [
-    /^$/, // empty cell
+    /^\s*$/, // empty cell
     /^[A-Z][a-z]{2},\s\d{1,2}\/\d{1,2}$/, // date cell e.g., "Sun, 8/20"
-    /^$/, // empty cell
+    /^\s*$/, // empty cell
     /^.*$/ // any text for event title, can be empty
 ]
